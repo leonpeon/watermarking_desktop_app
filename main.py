@@ -11,12 +11,15 @@ def image_select(image_name):
         file_name = os.path.join("images", image_name.replace("_thumbnail", ""))
         image = Image.open(file_name)
 
+    # Adjusts image size
     new_width = 300
     aspect_ratio = image.height / image.width
     new_height = int(new_width * aspect_ratio)
 
+    # Displays image on left side
     side_image_file = ImageTk.PhotoImage(image.resize((new_width, new_height), Image.Resampling.LANCZOS))
-    side_image = tk.Label(left_frame, image=side_image_file)
+    side_image.image = side_image_file
+    side_image.configure(image=side_image_file)
     side_image.pack(padx=50)
 
 
@@ -64,8 +67,9 @@ button = tk.Button(button_frame, text="Submit", width=15, command=None)
 button.pack(pady=20, ipadx=40)
 
 # LEFT FRAME
+side_image = tk.Label(left_frame)
+side_image.pack(padx=50)
 image_select("start")
-
 
 # RIGHT FRAME
 canvas = tk.Canvas(right_frame, background="pink", height=400, width=400)
@@ -95,7 +99,7 @@ for thumbnail in os.listdir("thumbnails"):
 
     img_obj = ImageTk.PhotoImage(Image.open(file))
 
-    label = tk.Button(image_frame, image=img_obj, command=lambda: image_select(thumbnail))
+    label = tk.Button(image_frame, image=img_obj, command=lambda thumbnail=thumbnail: image_select(thumbnail))
     label.image = img_obj
     label_list.append(label)
 
