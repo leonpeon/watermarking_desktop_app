@@ -1,4 +1,4 @@
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageDraw, ImageFont
 import tkinter as tk
 from random import randint, choice
 import os
@@ -22,6 +22,26 @@ def image_select(image_name):
     side_image.configure(image=side_image_file)
     side_image.pack(padx=50)
 
+# Adds a watermark onto a selected photo and saves it to the corresponding folder
+def watermark(img, watermark_text):
+    image = Image.open(img).convert("RGBA")
+    font_size = int(image.width // 20)
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.truetype("arial.ttf", font_size)
+
+    draw.text(xy=(0 + image.width // 10, image.height - image.height // 5),
+              text=f"© {watermark_text}",
+              font=font,
+              fill=(255, 255, 255, 200),
+              stroke_width=2,
+              stroke_fill="grey"
+              )
+
+    file = os.path.splitext(img)[0]
+    end_folder = os.path.join("watermarked_images", file, "_watermark.jpg")
+    image.save(end_folder, "JPEG")
+
+watermark("images/test.jpg")
 
 # Creates thumbnails for all images in the images file.
 for image in os.listdir("images"):
@@ -63,7 +83,7 @@ right_frame.grid_propagate(False)
 button_frame = tk.Frame(window)
 button_frame.grid(column=1, row=2)
 
-button = tk.Button(button_frame, text="Submit", width=15, command=None)
+button = tk.Button(button_frame, text="Add Watermark", width=15, command=None)
 button.pack(pady=20, ipadx=40)
 
 # LEFT FRAME
