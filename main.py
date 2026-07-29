@@ -1,6 +1,6 @@
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 import tkinter as tk
-from random import randint, choice
+from tkinter import simpledialog
 import os
 
 def image_select(image_name):
@@ -19,6 +19,8 @@ def image_select(image_name):
     # Displays image on left side
     side_image_file = ImageTk.PhotoImage(image.resize((new_width, new_height), Image.Resampling.LANCZOS))
     side_image.image = side_image_file
+    side_image.file_path = file_name
+    print(file_name)
     side_image.configure(image=side_image_file)
     side_image.pack(padx=50)
 
@@ -37,11 +39,31 @@ def watermark(img, watermark_text):
               stroke_fill="grey"
               )
 
-    file = os.path.splitext(img)[0]
-    end_folder = os.path.join("watermarked_images", file, "_watermark.jpg")
-    image.save(end_folder, "JPEG")
+    file = os.path.splitext(os.path.basename(img))[0]
+    end_folder = os.path.join("watermarked_images", file + "_watermark.jpg")
+    image.convert("RGB").save(end_folder, "JPEG")
+    show_final_image(end_folder)
 
-watermark("images/test.jpg")
+def customise_watermark():
+    user_text = simpledialog.askstring("Watermark", "Enter your watermark text: ")
+    image = side_image.file_path
+    print(image)
+    watermark(image, user_text)
+
+def show_final_image(image):
+    final_img_window = tk.Toplevel(window)
+    final_img_window.title("Watermarked Image")
+
+    final_image = Image.open(image)
+
+    final_image.thumbnail((600, 600))
+
+    photo = ImageTk.PhotoImage(final_image)
+
+    label = tk.Label(final_img_window, image=photo)
+    label.image = photo
+    label.pack()
+
 
 # Creates thumbnails for all images in the images file.
 for image in os.listdir("images"):
@@ -83,7 +105,7 @@ right_frame.grid_propagate(False)
 button_frame = tk.Frame(window)
 button_frame.grid(column=1, row=2)
 
-button = tk.Button(button_frame, text="Add Watermark", width=15, command=None)
+button = tk.Button(button_frame, text="Select Image", width=15, command=customise_watermark)
 button.pack(pady=20, ipadx=40)
 
 # LEFT FRAME
